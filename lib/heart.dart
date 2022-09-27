@@ -1,29 +1,51 @@
 import 'package:flutter/material.dart';
 
 class Heart extends StatelessWidget {
-  const Heart({Key? key}) : super(key: key);
+  final Color backgroundColor;
+  final Color borderColor;
+  final double height;
+  final double width;
+
+  const Heart({
+    Key? key,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.height,
+    required this.width,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(100, 110),
-      painter: HeartPainter(),
+      size: Size(width, height),
+      painter: HeartPainter(
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+      ),
     );
   }
 }
 
 class HeartPainter extends CustomPainter {
+  final Color backgroundColor;
+  final Color borderColor;
+
+  HeartPainter({
+    required this.backgroundColor,
+    required this.borderColor,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     Paint strokePaint = Paint();
     strokePaint
-      ..color = Colors.white
+      ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 2;
 
     Paint backgroundPaint = Paint()..style = PaintingStyle.fill;
-    backgroundPaint.color = const Color(0xff1DB954);
+    backgroundPaint.color = backgroundColor;
 
     Path path = Path();
     path.moveTo(
