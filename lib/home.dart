@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:heart_animation/constants.dart';
 
+import 'animated_heart.dart';
 import 'heart.dart';
 
 class Home extends StatefulWidget {
@@ -24,12 +25,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   late final ColorTween _heartConstantBackgroundColorTween;
   late final Animation<Size> _heartReleasedScaleAnimation;
   late bool _isPressed;
+  late final AnimationController _outerHeartReleasedScaleController;
 
   @override
   void initState() {
     super.initState();
     _isPressed = true;
     _heartPressedScaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+
+    _outerHeartReleasedScaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
@@ -46,7 +53,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     _heartReleasedScaleAnimation = Tween<Size>(
       begin: const Size(80, 90),
-      end: const Size(100, 110),
+      end: const Size(110, 120),
     ).animate(_heartReleasedScaleController);
 
     _heartConstantBackgroundColorTween = ColorTween(
@@ -67,15 +74,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     _heartBorderColorTween = ColorTween(
       begin: Colors.white,
-      end: Constants.black,
+      end: Colors.transparent,
     );
 
     _heartBorderColorAnimation =
         _heartBorderColorTween.animate(_heartPressedScaleController);
 
     _heartConstantBorderColorTween = ColorTween(
-      begin: Colors.black,
-      end: Constants.black,
+      begin: Colors.transparent,
+      end: Colors.transparent,
     );
 
     _heartConstantBorderColorAnimation =
@@ -85,6 +92,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void dispose() {
     _heartPressedScaleController.dispose();
+    _heartReleasedScaleController.dispose();
     super.dispose();
   }
 
@@ -112,35 +120,70 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       backgroundColor: Constants.black,
       body: GestureDetector(
         onTap: () {
-          _heartPressedScaleController.forward().then((value) {
-            setState(() {
-              _isPressed = false;
+          if (_isPressed) {
+            _heartPressedScaleController.forward().then((value) {
+              setState(() {
+                _isPressed = false;
+              });
+              _outerHeartReleasedScaleController.forward();
+              _heartReleasedScaleController.forward();
             });
-            _heartReleasedScaleController.forward();
-          });
+          } else {
+            setState(() {
+              _isPressed = true;
+            });
+            _heartPressedScaleController.reset();
+            _heartReleasedScaleController.reset();
+          }
         },
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _getHeartScaleAnimation(),
-            builder: (BuildContext context, Widget? child) {
-              return AnimatedBuilder(
-                animation: _getBackGroundAnimation(),
-                builder: (BuildContext context, Widget? child) {
-                  return AnimatedBuilder(
-                    animation: _getBorderColorAnimation(),
-                    builder: (BuildContext context, Widget? child) {
-                      return Heart(
-                        backgroundColor: _getBackGroundAnimation().value!,
-                        borderColor: _getBorderColorAnimation().value!,
-                        height: _getHeartScaleAnimation().value.height,
-                        width: _getHeartScaleAnimation().value.width,
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          ),
+        child: Stack(
+          children: [
+            if (!_isPressed) ...[
+              Positioned(
+                top: 0,
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: OuterAnimatedHeart(
+                  endSize: const Size(140, 150),
+                  opacity: .4,
+                  animationController: _outerHeartReleasedScaleController,
+                ),
+              ),
+              Positioned(
+                top: 0,
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: OuterAnimatedHeart(
+                  endSize: const Size(220, 230),
+                  opacity: .2,
+                  animationController: _outerHeartReleasedScaleController,
+                ),
+              ),
+            ],
+            AnimatedBuilder(
+              animation: _getHeartScaleAnimation(),
+              builder: (BuildContext context, Widget? child) {
+                return AnimatedBuilder(
+                  animation: _getBackGroundAnimation(),
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedBuilder(
+                      animation: _getBorderColorAnimation(),
+                      builder: (BuildContext context, Widget? child) {
+                        return Heart(
+                          backgroundColor: _getBackGroundAnimation().value!,
+                          borderColor: _getBorderColorAnimation().value!,
+                          height: _getHeartScaleAnimation().value.height,
+                          width: _getHeartScaleAnimation().value.width,
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
