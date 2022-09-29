@@ -38,7 +38,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     _outerHeartReleasedScaleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 200),
     );
 
     _heartReleasedScaleController = AnimationController(
@@ -125,7 +125,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               setState(() {
                 _isPressed = false;
               });
-              _outerHeartReleasedScaleController.forward();
+              _outerHeartReleasedScaleController.forward().then((value) {
+                _outerHeartReleasedScaleController.reverse();
+              });
               _heartReleasedScaleController.forward();
             });
           } else {
@@ -145,7 +147,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 right: 0,
                 left: 0,
                 child: OuterAnimatedHeart(
-                  endSize: const Size(140, 150),
+                  endSize: const Size(160, 180),
                   opacity: .4,
                   animationController: _outerHeartReleasedScaleController,
                 ),
@@ -162,26 +164,34 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 ),
               ),
             ],
-            AnimatedBuilder(
-              animation: _getHeartScaleAnimation(),
-              builder: (BuildContext context, Widget? child) {
-                return AnimatedBuilder(
-                  animation: _getBackGroundAnimation(),
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _getHeartScaleAnimation(),
                   builder: (BuildContext context, Widget? child) {
                     return AnimatedBuilder(
-                      animation: _getBorderColorAnimation(),
+                      animation: _getBackGroundAnimation(),
                       builder: (BuildContext context, Widget? child) {
-                        return Heart(
-                          backgroundColor: _getBackGroundAnimation().value!,
-                          borderColor: _getBorderColorAnimation().value!,
-                          height: _getHeartScaleAnimation().value.height,
-                          width: _getHeartScaleAnimation().value.width,
+                        return AnimatedBuilder(
+                          animation: _getBorderColorAnimation(),
+                          builder: (BuildContext context, Widget? child) {
+                            return Heart(
+                              backgroundColor: _getBackGroundAnimation().value!,
+                              borderColor: _getBorderColorAnimation().value!,
+                              height: _getHeartScaleAnimation().value.height,
+                              width: _getHeartScaleAnimation().value.width,
+                            );
+                          },
                         );
                       },
                     );
                   },
-                );
-              },
+                ),
+              ),
             ),
           ],
         ),
