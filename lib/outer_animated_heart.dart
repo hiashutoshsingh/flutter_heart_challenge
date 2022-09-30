@@ -22,6 +22,7 @@ class OuterAnimatedHeart extends StatefulWidget {
 class _OuterAnimatedHeartState extends State<OuterAnimatedHeart>
     with TickerProviderStateMixin {
   late final Animation<Size> _heartReleasedScaleAnimation;
+  late final Animation<double> _heartReleasedOpacityAnimation;
 
   @override
   void initState() {
@@ -29,6 +30,11 @@ class _OuterAnimatedHeartState extends State<OuterAnimatedHeart>
     _heartReleasedScaleAnimation = Tween<Size>(
       begin: const Size(80, 90),
       end: widget.endSize,
+    ).animate(widget.animationController);
+
+    _heartReleasedOpacityAnimation = Tween<double>(
+      begin: 0,
+      end: widget.opacity,
     ).animate(widget.animationController);
   }
 
@@ -39,7 +45,8 @@ class _OuterAnimatedHeartState extends State<OuterAnimatedHeart>
         animation: _heartReleasedScaleAnimation,
         builder: (BuildContext context, Widget? child) {
           return Heart(
-            backgroundColor: Constants.green.withOpacity(widget.opacity),
+            backgroundColor: Constants.green
+                .withOpacity(_heartReleasedOpacityAnimation.value),
             borderColor: Colors.transparent,
             height: _heartReleasedScaleAnimation.value.height,
             width: _heartReleasedScaleAnimation.value.width,

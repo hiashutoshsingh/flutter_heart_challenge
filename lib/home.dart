@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:heart_animation/constants.dart';
 
-import 'animated_heart.dart';
+import 'outer_animated_heart.dart';
 import 'heart.dart';
 
 class Home extends StatefulWidget {
@@ -15,101 +15,63 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   late final AnimationController _heartPressedScaleController;
   late final Animation<Size> _heartPressedScaleAnimation;
   late final Animation<Color?> _heartBackgroundColorAnimation;
-  late final Animation<Color?> _heartBorderColorAnimation;
-  late final ColorTween _heartBorderColorTween;
   late final ColorTween _heartBackgroundColorTween;
   late final AnimationController _heartReleasedScaleController;
-  late final Animation<Color?> _heartBackgroundConstantColorAnimation;
-  late final ColorTween _heartConstantBorderColorTween;
-  late final Animation<Color?> _heartConstantBorderColorAnimation;
-  late final ColorTween _heartConstantBackgroundColorTween;
   late final Animation<Size> _heartReleasedScaleAnimation;
-  late bool _isPressed;
   late final AnimationController _outerHeartReleasedScaleController;
+  late bool _showBorder;
 
   @override
   void initState() {
     super.initState();
-    _isPressed = true;
+    _showBorder = true;
+    _initHeartPressedAnimation();
+    _initHeartReleasedAnimation();
+    _initOuterHeartReleasedAnimation();
+  }
+
+  void _initHeartPressedAnimation() {
     _heartPressedScaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 200),
     );
-
-    _outerHeartReleasedScaleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-
-    _heartReleasedScaleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-
     _heartPressedScaleAnimation = Tween<Size>(
       begin: const Size(100, 110),
       end: const Size(80, 90),
     ).animate(_heartPressedScaleController);
+  }
+
+  void _initHeartReleasedAnimation() {
+    _heartReleasedScaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
 
     _heartReleasedScaleAnimation = Tween<Size>(
       begin: const Size(80, 90),
       end: const Size(110, 120),
     ).animate(_heartReleasedScaleController);
 
-    _heartConstantBackgroundColorTween = ColorTween(
-      begin: Constants.black,
-      end: Constants.black,
-    );
-
     _heartBackgroundColorTween = ColorTween(
       begin: Constants.black,
       end: Constants.green,
     );
 
-    _heartBackgroundConstantColorAnimation = _heartConstantBackgroundColorTween
-        .animate(_heartPressedScaleController);
-
     _heartBackgroundColorAnimation =
         _heartBackgroundColorTween.animate(_heartReleasedScaleController);
+  }
 
-    _heartBorderColorTween = ColorTween(
-      begin: Colors.white,
-      end: Colors.transparent,
+  void _initOuterHeartReleasedAnimation() {
+    _outerHeartReleasedScaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 200),
     );
-
-    _heartBorderColorAnimation =
-        _heartBorderColorTween.animate(_heartPressedScaleController);
-
-    _heartConstantBorderColorTween = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.transparent,
-    );
-
-    _heartConstantBorderColorAnimation =
-        _heartConstantBorderColorTween.animate(_heartReleasedScaleController);
-  }
-
-  @override
-  void dispose() {
-    _heartPressedScaleController.dispose();
-    _heartReleasedScaleController.dispose();
-    super.dispose();
-  }
-
-  Animation<Color?> _getBackGroundAnimation() {
-    return _isPressed
-        ? _heartBackgroundConstantColorAnimation
-        : _heartBackgroundColorAnimation;
-  }
-
-  Animation<Color?> _getBorderColorAnimation() {
-    return _isPressed
-        ? _heartBorderColorAnimation
-        : _heartConstantBorderColorAnimation;
   }
 
   Animation<Size> _getHeartScaleAnimation() {
-    return _isPressed
+    return !_heartPressedScaleController.isCompleted
         ? _heartPressedScaleAnimation
         : _heartReleasedScaleAnimation;
   }
@@ -120,82 +82,73 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       backgroundColor: Constants.black,
       body: GestureDetector(
         onTap: () {
-          if (_isPressed) {
-            _heartPressedScaleController.forward().then((value) {
-              setState(() {
-                _isPressed = false;
-              });
-              _outerHeartReleasedScaleController.forward().then((value) {
-                _outerHeartReleasedScaleController.reverse();
-              });
-              _heartReleasedScaleController.forward();
-            });
-          } else {
+          if (_heartPressedScaleController.isCompleted) {
             setState(() {
-              _isPressed = true;
+              _showBorder = true;
             });
             _heartPressedScaleController.reset();
             _heartReleasedScaleController.reset();
+            _outerHeartReleasedScaleController.reset();
+          } else {
+            _heartPressedScaleController.forward().then((value) {
+              setState(() {
+                _showBorder = false;
+              });
+              _heartReleasedScaleController.forward();
+              _outerHeartReleasedScaleController.forward().then((value) {
+                _outerHeartReleasedScaleController.reverse();
+              });
+            });
           }
         },
         child: Stack(
           children: [
-            if (!_isPressed) ...[
-              Positioned(
-                top: 0,
-                bottom: 0,
-                right: 0,
-                left: 0,
-                child: OuterAnimatedHeart(
-                  endSize: const Size(160, 180),
-                  opacity: .4,
-                  animationController: _outerHeartReleasedScaleController,
-                ),
+            Align(
+              alignment: Alignment.center,
+              child: OuterAnimatedHeart(
+                endSize: const Size(180, 190),
+                opacity: .3,
+                animationController: _outerHeartReleasedScaleController,
               ),
-              Positioned(
-                top: 0,
-                bottom: 0,
-                right: 0,
-                left: 0,
-                child: OuterAnimatedHeart(
-                  endSize: const Size(220, 230),
-                  opacity: .2,
-                  animationController: _outerHeartReleasedScaleController,
-                ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: OuterAnimatedHeart(
+                endSize: const Size(250, 260),
+                opacity: .1,
+                animationController: _outerHeartReleasedScaleController,
               ),
-            ],
-            Positioned(
-              top: 0,
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Center(
-                child: AnimatedBuilder(
-                  animation: _getHeartScaleAnimation(),
-                  builder: (BuildContext context, Widget? child) {
-                    return AnimatedBuilder(
-                      animation: _getBackGroundAnimation(),
-                      builder: (BuildContext context, Widget? child) {
-                        return AnimatedBuilder(
-                          animation: _getBorderColorAnimation(),
-                          builder: (BuildContext context, Widget? child) {
-                            return Heart(
-                              backgroundColor: _getBackGroundAnimation().value!,
-                              borderColor: _getBorderColorAnimation().value!,
-                              height: _getHeartScaleAnimation().value.height,
-                              width: _getHeartScaleAnimation().value.width,
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: AnimatedBuilder(
+                animation: _getHeartScaleAnimation(),
+                builder: (context, child) {
+                  return AnimatedBuilder(
+                    animation: _heartBackgroundColorAnimation,
+                    builder: (context, child) {
+                      return Heart(
+                        backgroundColor: _heartBackgroundColorAnimation.value!,
+                        borderColor:
+                            _showBorder ? Colors.white : Colors.transparent,
+                        height: _getHeartScaleAnimation().value.height,
+                        width: _getHeartScaleAnimation().value.width,
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _heartPressedScaleController.dispose();
+    _heartReleasedScaleController.dispose();
+    super.dispose();
   }
 }
