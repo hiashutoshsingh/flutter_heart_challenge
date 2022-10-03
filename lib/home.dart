@@ -34,7 +34,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _heartPressedScaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 200),
     );
     _heartPressedScaleAnimation = Tween<Size>(
       begin: const Size(100, 110),
@@ -51,10 +50,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _heartReleasedScaleAnimation = Tween<Size>(
       begin: const Size(80, 90),
       end: const Size(110, 120),
-    ).animate(_heartReleasedScaleController);
+    ).animate(
+      CurvedAnimation(
+        parent: _heartReleasedScaleController,
+        curve: Curves.easeOutBack,
+      ),
+    );
 
     _heartBackgroundColorTween = ColorTween(
-      begin: Constants.black,
+      begin: Colors.transparent,
       end: Constants.green,
     );
 
@@ -65,7 +69,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   void _initOuterHeartReleasedAnimation() {
     _outerHeartReleasedScaleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 200),
       reverseDuration: const Duration(milliseconds: 200),
     );
   }

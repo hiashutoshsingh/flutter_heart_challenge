@@ -27,6 +27,7 @@ class _OuterAnimatedHeartState extends State<OuterAnimatedHeart>
   @override
   void initState() {
     super.initState();
+
     _heartReleasedScaleAnimation = Tween<Size>(
       begin: const Size(80, 90),
       end: widget.endSize,
@@ -35,7 +36,12 @@ class _OuterAnimatedHeartState extends State<OuterAnimatedHeart>
     _heartReleasedOpacityAnimation = Tween<double>(
       begin: 0,
       end: widget.opacity,
-    ).animate(widget.animationController);
+    ).animate(
+      CurvedAnimation(
+        parent: widget.animationController,
+        curve: Curves.easeOutBack,
+      ),
+    );
   }
 
   @override
