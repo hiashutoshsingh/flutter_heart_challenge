@@ -7,7 +7,7 @@ This file is intended to be a guide for those who are interested in contributing
 
 Make sure you have Flutter installed and on your path (follow [installation guide](https://docs.flutter.dev/get-started/install)).
 
-Follow these steps to clone FL Chart and set up the development environment:
+Follow these steps to clone heart_animation_challenge and set up the development environment:
 
 1. Fork the repository
 
