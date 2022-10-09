@@ -2,10 +2,10 @@
 Create a Animation using Heart as a Widget 💙
 
 
-### Contributing
+### Contributing:
 Check out [CONTRIBUTING.md](https://github.com/hiashutoshsingh/heart_animation_challenge/blob/contribute/CONTRIBUTING.md), which contains a guide for those who want to contribute to the Heart Animation Challenge.
 
-### Inspiration
+### Inspiration:
 Take Animation Insipiration from these websites:
 
 [Spotify](https://spotify.design/article/bringing-the-spotify-heart-to-life)
