@@ -1,5 +1,5 @@
 # Heart Animation Challenge
-Create a Animation using Heart as a Widget 💙. Use this #flutterheartchallenge to share your project on social handles.
+Create a Animation using Heart as a Widget 💙. Use this [#flutterheartchallenge](https://twitter.com/search?q=%23flutterheartchallenge) to share your project on social handles.
 
 
 ### Contributing:
