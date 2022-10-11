@@ -10,7 +10,7 @@ This project is inspired from Dribble Design
 
 Here is how it looks :
 
-<img src="demo/demo.gif">
+<img src="demo/demo.gif" height=300>
 
 
 ## Getting Started
