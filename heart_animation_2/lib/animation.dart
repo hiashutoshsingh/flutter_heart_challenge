@@ -20,6 +20,7 @@ class _HeartAnimationState extends State<HeartAnimation> with TickerProviderStat
 
   @override
   void initState() {
+    super.initState();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -37,8 +38,6 @@ class _HeartAnimationState extends State<HeartAnimation> with TickerProviderStat
       parent: _controller,
       curve: const ElasticOutCurve(0.8),
     );
-
-    super.initState();
   }
 
   @override
